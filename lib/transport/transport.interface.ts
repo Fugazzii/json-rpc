@@ -1,17 +1,24 @@
-import { JsonRpcServer } from "../rpc-server";
-
 export type Address = { hostname: string, port: number };
-export type Callback = { cb: (...args: any) => any };
+export type Callback = (...args: any[]) => any;
+export type JsonRpcVersion = "1.0" | "2.0";
 
-export interface ITransport {
-    send(cb: Callback): void;
-    receive(cb: Callback): void;
+export type JsonRpcRequest = {
+    jsonrpc: JsonRpcVersion,
+    method: string,
+    params?: any[],
+    id: string
 }
 
-export interface ITransportClient extends ITransport {
-    connect(url: Address, transport: ITransport): ITransportClient;
+export type JsonRpcResponse<T> = {
+    jsonrpc: JsonRpcVersion,
+    result: T,
+    id: string
 }
 
-export interface ITransportServer extends ITransport {
-    run(url: Address, transport: ITransport): ITransportServer;
+export interface ITransportClient {
+    send(message: string): void;
+}
+
+export interface ITransportServer {
+    handleIncomingRequest(buffer: string): void;
 }
