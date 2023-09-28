@@ -13,25 +13,6 @@
  * JsonRpcServer gets response
 */
 
-import { JsonRpcClient } from "../lib/rpc-client";
-import { JsonRpcServer } from "../lib/rpc-server";
-import { TcpClient, TcpServer } from "../lib/transport";
+import { example1 } from "../examples";
 
-async function main() {
-    let addr = { hostname: "localhost", port: 3000 };
-
-    const transportServer = TcpServer.run(addr);
-    const transportClient = TcpClient.connect(addr);
-
-    const server = JsonRpcServer.run({ transport: transportServer });
-    server.addMethod("fn", () => "rpc-utesles");
-
-    const client1 = JsonRpcClient.connect({ transport: transportClient });
-    const client2 = JsonRpcClient.connect({ transport: transportClient });
-    const res = await client1.call("fn");
-    const pong = await client2.ping();
-
-    console.log(res, pong);
-}
-
-main();
+example1();
