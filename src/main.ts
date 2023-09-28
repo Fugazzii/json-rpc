@@ -18,7 +18,6 @@ import { JsonRpcServer } from "../lib/rpc-server";
 import { TcpClient, TcpServer } from "../lib/transport";
 
 async function main() {
-
     let addr = { hostname: "localhost", port: 3000 };
 
     const transportServer = TcpServer.run(addr);

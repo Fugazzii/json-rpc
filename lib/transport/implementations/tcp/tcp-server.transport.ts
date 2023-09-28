@@ -26,6 +26,7 @@ export class TcpServer implements ITransportServer {
         this.onRequestHandler = handler;
     }
 
+    /** Sends RPC response back to transport client */
     public sendResponse(response: JsonRpcResponse): void {
         process.nextTick(() => {
             const socket = this.pendingRequests.get(response.id);
@@ -36,11 +37,16 @@ export class TcpServer implements ITransportServer {
         })
     }
 
+    /** Listens incoming data (Rpc Requests) from client */
     private _handleClient(socket: Socket) {
         socket.setEncoding("utf-8");
     
         let dataBuffer = "";
     
+        /**
+         * We are getting data with chunks
+         * When \n occurs, it means end of the stream
+         */
         socket.on("data", (data: Buffer) => {
             dataBuffer += data.toString();
             
@@ -68,7 +74,9 @@ export class TcpServer implements ITransportServer {
         });
     }
     
-
+    /** 
+     * Parses string into json
+     * This method is used for error handling */
     private _parseJson(data: string): JsonRpcRequest {
         try {
             let result = JSON.parse(data.trim());
