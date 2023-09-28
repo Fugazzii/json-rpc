@@ -18,7 +18,7 @@ export type JsonRpcResponse = {
 }
 
 export interface ITransportClient {
-    send(message: string): Promise<JsonRpcResponse>;
+    send(message: string, args?: any[]): Promise<JsonRpcResponse>;
 }
 
 export interface ITransportServer {

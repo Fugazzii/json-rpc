@@ -25,7 +25,7 @@ export class TcpClient implements ITransportClient {
      * Generates unique ID so we can identify its response by matching IDs
      * Sends request object to server and stores its Promise resolve callback in Map
      */
-    public send(method: string): Promise<JsonRpcResponse> {
+    public send(method: string, args?: any[]): Promise<JsonRpcResponse> {
         
         let currentTime = Date.now();
         let uniqueId = String(currentTime) + this._generateRequestId();
@@ -33,7 +33,7 @@ export class TcpClient implements ITransportClient {
         const jsonRpcRequest: JsonRpcRequest = {
             jsonrpc: "2.0",
             method,
-            params: [],
+            params: args,
             id: uniqueId
         };
         

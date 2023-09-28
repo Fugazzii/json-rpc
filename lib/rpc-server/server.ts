@@ -23,18 +23,16 @@ export class JsonRpcServer {
         this.handlers.set(handlerName, cb);
     }
 
-    /**
-     * Gets name of the handler, executes it and returns response
-    */
+    /** Gets name of the handler, executes it and returns response */
     private _handleRequest(requestData: JsonRpcRequest) {
-        const { method, id } = requestData;
+        const { method, id, params } = requestData;
 
         const cb = this.handlers.get(method);
         
         if (!cb) return;
         
         try {
-            const result = cb();
+            const result = params ? cb(...params) : cb();
             this._sendRpcResponse(id, result);
         } catch (error) {
             throw error;
