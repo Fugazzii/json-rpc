@@ -9,9 +9,9 @@ export type JsonRpcRequest = {
     id: string
 }
 
-export type JsonRpcResponse<T> = {
+export type JsonRpcResponse = {
     jsonrpc: JsonRpcVersion,
-    result: T,
+    result: any,
     id: string
 }
 
