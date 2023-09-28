@@ -1,3 +1,5 @@
+import { EventEmitter } from "node:stream";
+
 export type Address = { hostname: string, port: number };
 export type Callback = (...args: any[]) => any;
 export type JsonRpcVersion = "1.0" | "2.0";
@@ -16,9 +18,11 @@ export type JsonRpcResponse = {
 }
 
 export interface ITransportClient {
-    send(message: string): void;
+    send(message: string): Promise<JsonRpcResponse>;
 }
 
 export interface ITransportServer {
-    handleIncomingRequest(buffer: string): void;
+    onRequest(handler: (req: JsonRpcRequest) => void): void;  
+    sendResponse(resp: JsonRpcResponse): void;  
 }
+  

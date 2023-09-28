@@ -8,7 +8,7 @@ export class TcpClient implements ITransportClient {
     private readonly socket: net.Socket; 
     private readonly pendingRequests: Map<string, ResponseResolver>;
 
-    public constructor({ hostname, port }: Address) {
+    private constructor({ hostname, port }: Address) {
         this.socket = net.connect({ port, host: hostname });
         this.pendingRequests = new Map();
 
@@ -38,7 +38,7 @@ export class TcpClient implements ITransportClient {
         };
         
         return new Promise((resolve: ResponseResolver, reject) => {
-            const requestString = jsonRpcRequest.toString();
+            const requestString = JSON.stringify(jsonRpcRequest) + "\n";
             const requestBuffer = Buffer.from(requestString);
 
             this.pendingRequests.set(uniqueId, resolve);
@@ -50,27 +50,38 @@ export class TcpClient implements ITransportClient {
     private _listenForResponses() {
         this.socket.setEncoding("utf8");
 
-        this.socket.on("data", (data: Buffer) => {
-            const chunk = data.toString();
-            const responses = chunk.split("\n");
+        let dataBuffer = ''; 
 
-            for (const response of responses) {
+        this.socket.on("data", (data: Buffer) => {
+            dataBuffer += data.toString();
+
+            let startIndex = 0;
+            let endIndex = dataBuffer.indexOf("\n");
+
+            while (endIndex !== -1) {
+                const response = dataBuffer.substring(startIndex, endIndex).trim();
                 this._handleResponse(response);
+                startIndex = endIndex + 1;
+                endIndex = dataBuffer.indexOf("\n", startIndex);
             }
+
+            dataBuffer = dataBuffer.substring(startIndex);
         });
+
     }
+
 
     /** When response is returned, it is parsed, before deleting from the Map checks if exists and then resolves */
     private _handleResponse(response: string) {
         try {
             const { id, result }: JsonRpcResponse = JSON.parse(response);
-        
+
             if(!this.pendingRequests.has(id)) return;
 
             const resolve = this.pendingRequests.get(id) as ResponseResolver;
 
             this.pendingRequests.delete(id);
-
+            
             resolve(result);
         } catch (error) {
             throw error;            
