@@ -9,6 +9,11 @@ export class JsonRpcClient {
         return new JsonRpcClient(transport);
     }
 
+    /** Destroyes socket */
+    public close() {
+        this.transport.close();
+    }
+
     /** Calls function from RPC server */
     public async call(handlerName: string, args?: any[]): Promise<JsonRpcResponse> {
         return this.transport.send(handlerName, args);

@@ -17,6 +17,11 @@ export class JsonRpcServer {
     public static run({ transport }: { transport: ITransportServer }) {
         return new JsonRpcServer(transport);
     }
+
+    /** Destroyes socket */
+    public close() {
+        this.transport.close();
+    }
     
     /** Adds method in RPC server */
     public addMethod(handlerName: string, cb: Callback) { 

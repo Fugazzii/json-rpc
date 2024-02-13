@@ -19,10 +19,12 @@ export type JsonRpcResponse = {
 
 export interface ITransportClient {
     send(message: string, args?: any[]): Promise<JsonRpcResponse>;
+    close(): void;
 }
 
 export interface ITransportServer {
     onRequest(handler: (req: JsonRpcRequest) => void): void;  
-    sendResponse(resp: JsonRpcResponse): void;  
+    sendResponse(resp: JsonRpcResponse): void;
+    close(): void;
 }
   

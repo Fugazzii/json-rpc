@@ -22,6 +22,10 @@ export class TcpServer implements ITransportServer {
         return new TcpServer({ hostname, port });
     }
 
+    public close() {
+        this.server.close();
+    }
+
     public onRequest(handler: (requestData: JsonRpcRequest) => void): void {
         this.onRequestHandler = handler;
     }

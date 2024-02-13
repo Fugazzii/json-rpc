@@ -20,6 +20,10 @@ export class TcpClient implements ITransportClient {
         return new TcpClient(addr);
     }
 
+    public close() {
+        this.socket.destroy();
+    }
+
     /**
      * This method recieves method name of RPC method
      * Generates unique ID so we can identify its response by matching IDs
