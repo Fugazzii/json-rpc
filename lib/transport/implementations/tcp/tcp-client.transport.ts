@@ -28,7 +28,6 @@ export class TcpClient implements ITransportClient {
         let currentTime = Date.now();
         let uniqueId = String(currentTime) + this._generateRequestId();
 
-        console.log("args", {...args});
         const jsonRpcRequest: JsonRpcRequest = {
             jsonrpc: "2.0",
             method,

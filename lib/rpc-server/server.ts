@@ -39,7 +39,6 @@ export class JsonRpcServer {
         }
         
         try {
-            console.log("params", params);
             const result = params ? cb(...params) : cb();
             this._sendRpcResponse(id, result);
         } catch (error) {
