@@ -1,6 +1,7 @@
 {
-  "name": "json-rpc",
+  "name": "flex-rpc",
   "module": "./src/main.ts",
+  "version": "1.0.1",
   "type": "module",
   "devDependencies": {
     "bun-types": "latest"
