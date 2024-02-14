@@ -15,16 +15,18 @@ export class JsonRpcClient {
     }
 
     /** Calls function from RPC server */
-    public async call(handlerName: string, args?: any[]): Promise<JsonRpcResponse> {
+    public call(handlerName: string, ...args: any): Promise<JsonRpcResponse> {
+        console.log("call args", args);
         return this.transport.send(handlerName, args);
     }
 
     /** Calls function from RPC server without waiting response */
-    public async notify(handlerName: string, args?: any[]): Promise<void> {
-        this.transport.send(handlerName, args);
+    public notify(handlerName: string, ...args: any): void {
+        console.log("notify args", args);        
+        this.transport.send(handlerName, ...args);
     }
 
-    public async ping(): Promise<JsonRpcResponse> {
+    public ping(): Promise<JsonRpcResponse> {
         return this.transport.send("ping");
     }
     

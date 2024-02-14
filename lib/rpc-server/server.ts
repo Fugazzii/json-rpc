@@ -14,7 +14,7 @@ export class JsonRpcServer {
     }
     
     /** Static constructor */
-    public static run({ transport }: { transport: ITransportServer }) {
+    public static listen({ transport }: { transport: ITransportServer }) {
         return new JsonRpcServer(transport);
     }
 
@@ -24,7 +24,7 @@ export class JsonRpcServer {
     }
     
     /** Adds method in RPC server */
-    public addMethod(handlerName: string, cb: Callback) { 
+    public expose(handlerName: string, cb: Callback) { 
         this.handlers.set(handlerName, cb);
     }
 
@@ -34,9 +34,12 @@ export class JsonRpcServer {
 
         const cb = this.handlers.get(method);
         
-        if (!cb) return;
+        if (!cb) {
+            return;
+        }
         
         try {
+            console.log("params", params);
             const result = params ? cb(...params) : cb();
             this._sendRpcResponse(id, result);
         } catch (error) {
@@ -56,6 +59,6 @@ export class JsonRpcServer {
 
     /** Default testing function */
     private _registerPingFunction() {
-        this.addMethod("ping", () => "pong!");
+        this.expose("ping", () => "pong!");
     }
 }

@@ -1,25 +1,21 @@
 import net, { Socket } from "net";
-import { Address, ITransportServer, JsonRpcRequest, JsonRpcResponse } from "../.."; // Adjust import paths as needed
+import { Address, ITransportServer, JsonRpcRequest, JsonRpcResponse } from "../..";
 
 export class TcpServer implements ITransportServer {
     private readonly server: net.Server;
     private readonly pendingRequests: Map<string, Socket>;
     private onRequestHandler: ((requestData: JsonRpcRequest) => void) | null;
 
-    private constructor({ hostname, port }: Address) {
+    public constructor({ host, port }: Address) {
         this.pendingRequests = new Map();
         this.server = net.createServer((socket: Socket) => {
             this._handleClient(socket);
         });
         this.onRequestHandler = null;
 
-        this.server.listen(port, hostname, () => {
-            console.log(`TCP server is listening on ${hostname}:${port}`);
+        this.server.listen(port, host, () => {
+            console.log(`TCP server is listening on ${host}:${port}`);
         });
-    }
-
-    public static run({ hostname, port }: Address): TcpServer {
-        return new TcpServer({ hostname, port });
     }
 
     public close() {
@@ -60,16 +56,12 @@ export class TcpServer implements ITransportServer {
             const jsonStr = dataBuffer.substring(0, newlineIndex);
             dataBuffer = dataBuffer.substring(newlineIndex + 1);
 
-            try {
-                const requestData: JsonRpcRequest = this._parseJson(jsonStr);
+            const requestData: JsonRpcRequest = this._parseJson(jsonStr);
 
-                if (requestData) {
-                    this._handleRequest(socket, requestData);
-                }
-                this.pendingRequests.set(requestData.id, socket);
-            } catch (err) {
-                console.error("Error while processing JSON request:", err);
+            if (requestData) {
+                this._handleRequest(requestData);
             }
+            this.pendingRequests.set(requestData.id, socket);
 
         });
     
@@ -83,15 +75,14 @@ export class TcpServer implements ITransportServer {
      * This method is used for error handling */
     private _parseJson(data: string): JsonRpcRequest {
         try {
-            let result = JSON.parse(data.trim());
-            return result;
+            return JSON.parse(data.trim());
         } catch (err) {
             console.error("Error while parsing JSON", err);
             throw err;
         }
     }
 
-    private _handleRequest(socket: Socket, requestData: JsonRpcRequest) {
+    private _handleRequest(requestData: JsonRpcRequest) {
         if (this.onRequestHandler) {
             this.onRequestHandler(requestData);
         }

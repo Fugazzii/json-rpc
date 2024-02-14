@@ -1,14 +1,12 @@
-import { EventEmitter } from "node:stream";
-
-export type Address = { hostname: string, port: number };
+export type Address = { host: string, port: number };
 export type Callback = (...args: any[]) => any;
 export type JsonRpcVersion = "1.0" | "2.0";
 
 export type JsonRpcRequest = {
     jsonrpc: JsonRpcVersion,
     method: string,
+    id: string,
     params?: any[],
-    id: string
 }
 
 export type JsonRpcResponse = {
@@ -18,7 +16,7 @@ export type JsonRpcResponse = {
 }
 
 export interface ITransportClient {
-    send(message: string, args?: any[]): Promise<JsonRpcResponse>;
+    send(message: string, ...args: any): Promise<JsonRpcResponse>;
     close(): void;
 }
 

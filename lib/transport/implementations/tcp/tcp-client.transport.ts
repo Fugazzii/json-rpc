@@ -8,16 +8,11 @@ export class TcpClient implements ITransportClient {
     private readonly socket: net.Socket; 
     private readonly pendingRequests: Map<string, ResponseResolver>;
 
-    private constructor({ hostname, port }: Address) {
-        this.socket = net.connect({ port, host: hostname });
+    public constructor({ host, port }: Address) {
+        this.socket = net.connect({ port, host });
         this.pendingRequests = new Map();
 
         this._listenForResponses();
-    }
-
-    /** Constructor for client */
-    public static connect(addr: Address): TcpClient {
-        return new TcpClient(addr);
     }
 
     public close() {
@@ -29,11 +24,11 @@ export class TcpClient implements ITransportClient {
      * Generates unique ID so we can identify its response by matching IDs
      * Sends request object to server and stores its Promise resolve callback in Map
      */
-    public send(method: string, args?: any[]): Promise<JsonRpcResponse> {
-        
+    public send(method: string, args: any): Promise<JsonRpcResponse> {        
         let currentTime = Date.now();
         let uniqueId = String(currentTime) + this._generateRequestId();
 
+        console.log("args", {...args});
         const jsonRpcRequest: JsonRpcRequest = {
             jsonrpc: "2.0",
             method,
@@ -41,7 +36,7 @@ export class TcpClient implements ITransportClient {
             id: uniqueId
         };
         
-        return new Promise((resolve: ResponseResolver, reject) => {
+        return new Promise((resolve: ResponseResolver, _reject) => {
             const requestString = JSON.stringify(jsonRpcRequest) + "\n";
             const requestBuffer = Buffer.from(requestString);
 
@@ -73,7 +68,6 @@ export class TcpClient implements ITransportClient {
         });
 
     }
-
 
     /** When response is returned, it is parsed, before deleting from the Map checks if exists and then resolves */
     private _handleResponse(response: string) {
